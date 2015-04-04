@@ -1,6 +1,11 @@
 " Vim plugin for showing matching parens
-" Maintainer:  Bram Moolenaar <Bram@vim.org>
-" Last Change: 2014 Jul 19
+" Maintainer: Eric Langlois <eric@langlois.xyz>
+" Original Maintainer:  Bram Moolenaar <Bram@vim.org>
+" Last Change: 2015 April 04
+"
+" Added option g:matchparen_cursor_hold
+" If set to 1, paren matching happens only after no keys have been pressed for
+" 'updatetime' (default 4s)
 
 " Exit quickly when:
 " - this plugin was already loaded (or disabled)
@@ -17,12 +22,19 @@ endif
 if !exists("g:matchparen_insert_timeout")
   let g:matchparen_insert_timeout = 60
 endif
+if !exists("g:matchparen_cursor_hold")
+  let g:matchparen_cursor_hold = 0
+endif
 
 augroup matchparen
   " Replace all matchparen autocommands
-  autocmd! CursorMoved,CursorMovedI,WinEnter * call s:Highlight_Matching_Pair()
-  if exists('##TextChanged')
-    autocmd! TextChanged,TextChangedI * call s:Highlight_Matching_Pair()
+  if g:matchparen_cursor_hold
+    autocmd! CursorMoved,CursorMovedI,WinEnter * call s:Highlight_Matching_Pair()
+    if exists('##TextChanged')
+      autocmd! TextChanged,TextChangedI * call s:Highlight_Matching_Pair()
+    endif
+  elseif exists('##CursorHold')
+    autocmd! CursorHold,CursorHoldI * call s:Highlight_Matching_Pair()
   endif
 augroup END
 
